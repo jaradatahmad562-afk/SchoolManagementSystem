@@ -4,3 +4,37 @@ GET {{SchoolManagement_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+POST {{SchoolManagement_HostAddress}}/api/Student
+Content-Type: application/json
+
+{
+  "name": "Zaid Ahmad",
+  "birthDate": "2002-05-15",
+  "classroomId": 1, 
+  "subjectId": 1
+}
+###
+GET {{SchoolManagement_HostAddress}}/api/Classroom
+Accept: application/json
+
+###
+DELETE {{SchoolManagement_HostAddress}}/api/Student/8
+###
+PUT {{SchoolManagement_HostAddress}}/api/Student/11
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": 11,
+  "name": "Zaid",
+  "birthDate": "2004-03-20",
+  "classroomId": 1, 
+  "subjectId": 2
+}
+
+### 
+POST {{SchoolManagement_HostAddress}}/api/Student/list
+Content-Type: application/json
+
+{}
+

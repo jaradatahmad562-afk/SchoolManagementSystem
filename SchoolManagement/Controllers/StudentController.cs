@@ -69,5 +69,13 @@ namespace SchoolManagement.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+        [HttpPost("list")]
+        public IActionResult GetStudentsPost()
+        {
+            var students = _context.Students.ToList();
+            return Ok(students);
+        }
+
+
     }
 }

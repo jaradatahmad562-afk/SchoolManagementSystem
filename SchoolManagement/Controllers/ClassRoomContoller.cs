@@ -35,7 +35,7 @@ namespace SchoolManagement.Controllers
         public async Task<IActionResult> DeleteClassroom(int id)
         {
             var classroom = await _context.Classrooms.FindAsync(id);
-            if (classroom == null) return NotFound("القاعة غير موجودة.");
+            if (classroom == null) return NotFound("not available");
 
             _context.Classrooms.Remove(classroom);
             await _context.SaveChangesAsync();
