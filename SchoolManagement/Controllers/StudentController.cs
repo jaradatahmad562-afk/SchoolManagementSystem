@@ -20,7 +20,18 @@ namespace SchoolManagement.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
         {
-            return await _context.Students.ToListAsync();
+            var students = await _context.Students.ToListAsync();
+
+            foreach (var student in students)
+            {
+                if (string.IsNullOrEmpty(student.Status))
+                {
+                    student.Status = "Active";
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            return Ok(students);
         }
 
         [HttpGet("{id}")]

@@ -57,6 +57,7 @@ public class EnrollmentController : ControllerBase
             .Where(e => e.StudentId == studentId)
             .Include(e => e.Subject) 
             .Select(e => new {
+                SubjectId = e.SubjectId,
                 SubjectName = e.Subject.Title,
                 Grade = e.Grade,
                 Date = e.ExamDate

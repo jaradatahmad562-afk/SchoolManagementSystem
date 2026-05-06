@@ -31,16 +31,50 @@ namespace SchoolManagement.Controllers
             return CreatedAtAction(nameof(GetClassrooms), new { id = classroom.Id }, classroom);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateClassroom(int id, Classroom classroom)
+        {
+            if (id != classroom.Id)
+            {
+                return BadRequest("ID mismatch");
+            }
+
+            _context.Entry(classroom).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ClassroomExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClassroom(int id)
         {
             var classroom = await _context.Classrooms.FindAsync(id);
             if (classroom == null) return NotFound("not available");
 
-            _context.Classrooms.Remove(classroom);
+            _context.Remove(classroom);
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        private bool ClassroomExists(int id)
+        {
+            return _context.Classrooms.Any(e => e.Id == id);
         }
     }
 }

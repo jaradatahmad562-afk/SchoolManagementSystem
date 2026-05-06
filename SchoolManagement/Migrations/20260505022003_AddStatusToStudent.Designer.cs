@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagement.Data;
 
@@ -11,9 +12,11 @@ using SchoolManagement.Data;
 namespace SchoolManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505022003_AddStatusToStudent")]
+    partial class AddStatusToStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace SchoolManagement.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Classroom", b =>
+            modelBuilder.Entity("SchoolManagement.Models.Classroom", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,13 +33,7 @@ namespace SchoolManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Capacity")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -142,7 +139,7 @@ namespace SchoolManagement.Migrations
                     b.Property<int>("Credits")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TeacherId")
+                    b.Property<int>("TeacherId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -195,7 +192,7 @@ namespace SchoolManagement.Migrations
 
             modelBuilder.Entity("SchoolManagement.Models.Schedule", b =>
                 {
-                    b.HasOne("Classroom", "Classroom")
+                    b.HasOne("SchoolManagement.Models.Classroom", "Classroom")
                         .WithMany()
                         .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -214,7 +211,7 @@ namespace SchoolManagement.Migrations
 
             modelBuilder.Entity("SchoolManagement.Models.Student", b =>
                 {
-                    b.HasOne("Classroom", "Classroom")
+                    b.HasOne("SchoolManagement.Models.Classroom", "Classroom")
                         .WithMany("Students")
                         .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -231,12 +228,14 @@ namespace SchoolManagement.Migrations
                 {
                     b.HasOne("SchoolManagement.Models.Teacher", "Teacher")
                         .WithMany("Subjects")
-                        .HasForeignKey("TeacherId");
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("Classroom", b =>
+            modelBuilder.Entity("SchoolManagement.Models.Classroom", b =>
                 {
                     b.Navigation("Students");
                 });

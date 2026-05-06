@@ -18,5 +18,6 @@ namespace SchoolManagement.Models
 
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
+        public string Status { get; set; } = "Active"; 
     }
 }
