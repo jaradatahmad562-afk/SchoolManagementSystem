@@ -32,39 +32,48 @@ namespace SchoolManagement.Controllers
                 })
                 .ToListAsync();
         }
-
         [HttpPost]
-        public async Task<ActionResult<Schedule>> PostSchedule(Schedule newSchedule)
+        public async Task<IActionResult> PostSchedule([FromBody] CreateScheduleDto dto)
         {
-            var isRoomBusy = await _context.Schedules.AnyAsync(s =>
-                s.ClassroomId == newSchedule.ClassroomId &&
-                s.Day == newSchedule.Day &&
-                ((newSchedule.StartTime < s.EndTime && newSchedule.EndTime > s.StartTime)));
+            var subject = await _context.Subjects.FindAsync(dto.SubjectId);
+            if (subject == null) return BadRequest("Subject not found");
 
-            if (isRoomBusy)
+            var schedule = new Schedule
             {
-                return BadRequest("not available");
-            }
+                Day = (DayOfWeek)dto.Day,
+                StartTime = TimeSpan.Parse(dto.StartTime),
+                EndTime = TimeSpan.Parse(dto.EndTime),
+                SubjectId = dto.SubjectId,
+                ClassroomId = dto.ClassroomId
+            };
 
-            var subject = await _context.Subjects.FindAsync(newSchedule.SubjectId);
-            if (subject == null) return BadRequest("not available");
+            var conflict = await _context.Schedules.AnyAsync(s =>
+                s.ClassroomId == schedule.ClassroomId &&
+                s.Day == schedule.Day &&
+                (schedule.StartTime < s.EndTime &&
+                 schedule.EndTime > s.StartTime)
+            );
 
-            var isTeacherBusy = await _context.Schedules
-                .Include(s => s.Subject)
-                .AnyAsync(s =>
-                    s.Subject.TeacherId == subject.TeacherId &&
-                    s.Day == newSchedule.Day &&
-                    ((newSchedule.StartTime < s.EndTime && newSchedule.EndTime > s.StartTime)));
+            if (conflict)
+                return BadRequest("Conflict");
 
-            if (isTeacherBusy)
-            {
-                return BadRequest("not available");
-            }
-
-            _context.Schedules.Add(newSchedule);
+            _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();
 
-            return Ok(new {  data = newSchedule });
+            return Ok(schedule);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSchedule(int id)
+        {
+            var schedule = await _context.Schedules.FindAsync(id);
+
+            if (schedule == null) return NotFound();
+
+            _context.Schedules.Remove(schedule);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent(); 
         }
     }
 }

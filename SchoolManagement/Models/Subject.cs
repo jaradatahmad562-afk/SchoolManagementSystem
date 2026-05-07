@@ -1,16 +1,14 @@
-﻿namespace SchoolManagement.Models
+﻿using SchoolManagement.Models;
+
+public class Subject
 {
-    public class Subject
-    {
-        public int Id { get; set; }
-        public string Title { get; set; } = string.Empty; 
-        public int Credits { get; set; } 
+    public int Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public int Credits { get; set; }
 
-        public int ? TeacherId { get; set; }
-        public Teacher? Teacher { get; set; }
+    public int? TeacherId { get; set; }
+    public Teacher? Teacher { get; set; }
 
-        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
-           
-        public ICollection<Student> StudentSubjects { get; set; } = new List<Student>();
-    }
+    public ICollection<Enrollment>? Enrollments { get; set; } = null;
+    public ICollection<Student>? StudentsSubjects { get; set; } = null;
 }

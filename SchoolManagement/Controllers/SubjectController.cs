@@ -33,8 +33,18 @@ public class SubjectController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateSubject(Subject subject)
     {
-        var teacherExists = await _context.Teachers.AnyAsync(t => t.Id == subject.TeacherId);
-        if (!teacherExists) return BadRequest("not available");
+        if (subject.TeacherId.HasValue && subject.TeacherId > 0)
+        {
+            var teacherExists = await _context.Teachers.AnyAsync(t => t.Id == subject.TeacherId);
+            if (!teacherExists)
+            {
+                return BadRequest("not available");
+            }
+        }
+        else
+        {
+            subject.TeacherId = null;
+        }
 
         _context.Subjects.Add(subject);
         await _context.SaveChangesAsync();
