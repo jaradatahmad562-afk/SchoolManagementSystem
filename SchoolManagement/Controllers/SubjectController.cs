@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Models;
-using Microsoft.EntityFrameworkCore;
-
+//[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class SubjectController : ControllerBase

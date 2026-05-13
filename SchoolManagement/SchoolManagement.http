@@ -1,3 +1,4 @@
+
 @SchoolManagement_HostAddress = http://localhost:5221
 
 GET {{SchoolManagement_HostAddress}}/weatherforecast/
@@ -36,5 +37,21 @@ Content-Type: application/json
 POST {{SchoolManagement_HostAddress}}/api/Student/list
 Content-Type: application/json
 
-{}
+### 
+POST https://localhost:7264/api/Auth/login
+Content-Type: application/json
 
+{
+  "email": "mohammad@school.com",
+  "password": "123"
+}
+
+
+###
+GET {{SchoolManagement_HostAddress}}/api/Classroom
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiQW1tYXIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJUZWFjaGVyIiwiZXhwIjoxNzc4NjU2MTIzLCJpc3MiOiJTY2hvb2xNYW5hZ2VtZW50IiwiYXVkIjoiU2Nob29sTWFuYWdlbWVudFVzZXJzIn0.hs9yemcHgzAD91tQ94CouYHguHkVwZn0mX6d12IiD4Q
+Accept: application/json
+
+###
+GET {{SchoolManagement_HostAddress}}/api/Classroom
+Accept: application/json

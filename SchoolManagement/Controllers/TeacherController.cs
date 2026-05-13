@@ -66,6 +66,7 @@
 //        }
 //    }
 //}
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
@@ -73,6 +74,7 @@ using SchoolManagement.Models;
 
 namespace SchoolManagement.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TeacherController : ControllerBase
