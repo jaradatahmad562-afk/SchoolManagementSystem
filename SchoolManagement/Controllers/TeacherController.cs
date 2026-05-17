@@ -74,7 +74,7 @@ using SchoolManagement.Models;
 
 namespace SchoolManagement.Controllers
 {
-    //[Authorize]
+    [Authorize(Roles = "Admin")] // 👈 السحر كله هون! قفلنا الكلاس كامل مكمل للأدمن فقط 🔒
     [Route("api/[controller]")]
     [ApiController]
     public class TeacherController : ControllerBase
@@ -101,11 +101,32 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Teacher>> PostTeacher(Teacher teacher)
+        public async Task<ActionResult<Teacher>> PostTeacher([FromBody] TeacherCreationDto dto)
         {
-            _context.Teachers.Add(teacher);
+            // 1. أولاً: ننشئ حساب مستخدم جديد في جدول الـ Users
+            var newUser = new User
+            {
+                Username = dto.Name.ToLower().Replace(" ", ""),
+                Email = dto.Email,
+                Password = dto.Password,
+                Role = "Teacher"
+            };
+
+            _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
-            return Ok(teacher);
+
+            // 2. ثانياً: ننشئ المدرس في جدول الـ Teachers ونربطه بالـ UserId الجديد
+            var newTeacher = new Teacher
+            {
+                Name = dto.Name,
+                Specialization = dto.Subject,
+                UserId = newUser.Id
+            };
+
+            _context.Teachers.Add(newTeacher);
+            await _context.SaveChangesAsync();
+
+            return Ok(newTeacher);
         }
 
         [HttpPut("{id}")]

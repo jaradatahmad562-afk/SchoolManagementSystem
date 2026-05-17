@@ -6,7 +6,7 @@ using SchoolManagement.Models;
 
 namespace SchoolManagement.Controllers
 {
-    //[Authorize]
+    [Authorize] // 👈 شلنا التعليق وخليناها عامة عشان الأدمن والمدرس يقدروا يدخلوا ويشتغلوا كامل العمليات
     [Route("api/[controller]")]
     [ApiController]
     public class ScheduleController : ControllerBase
@@ -29,11 +29,12 @@ namespace SchoolManagement.Controllers
                     s.Id,
                     s.Day,
                     Time = $"{s.StartTime:hh\\:mm} - {s.EndTime:hh\\:mm}",
-                    SubjectName = s.Subject.Title,
-                    RoomName = s.Classroom.Name
+                    SubjectName = s.Subject != null ? s.Subject.Title : "No Subject",
+                    RoomName = s.Classroom != null ? s.Classroom.Name : "No Room"
                 })
                 .ToListAsync();
         }
+
         [HttpPost]
         public async Task<IActionResult> PostSchedule([FromBody] CreateScheduleDto dto)
         {
@@ -64,6 +65,7 @@ namespace SchoolManagement.Controllers
 
             return Ok(schedule);
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
@@ -72,10 +74,9 @@ namespace SchoolManagement.Controllers
             if (schedule == null) return NotFound();
 
             _context.Schedules.Remove(schedule);
-
             await _context.SaveChangesAsync();
 
-            return NoContent(); 
+            return NoContent();
         }
     }
 }

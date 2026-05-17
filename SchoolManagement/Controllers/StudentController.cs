@@ -1,24 +1,24 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Data; 
+using SchoolManagement.Data;
 using SchoolManagement.Models;
 
 namespace SchoolManagement.Controllers
 {
-    //[Authorize]
-    [Route("api/[controller]")] 
+    [Authorize] // 👈 1. شلنا التعليق وخليناها عامة (أدمن + مدرس) عشان الطرفين يقدروا يقرأوا بيانات الطلاب
+    [Route("api/[controller]")]
     [ApiController]
     public class StudentController : ControllerBase
     {
         private readonly AppDbContext _context;
-
 
         public StudentController(AppDbContext context)
         {
             _context = context;
         }
 
+        // 🟢 مسموح للكل (أدمن ومدرس) عشان المدرس يشوف طلابه
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
         {
@@ -36,14 +36,17 @@ namespace SchoolManagement.Controllers
             return Ok(students);
         }
 
+        // 🟢 مسموح للكل لقراءة تفاصيل طالب معين
         [HttpGet("{id}")]
         public async Task<ActionResult<Student>> GetStudent(int id)
         {
             var student = await _context.Students.FindAsync(id);
-            if (student == null) return NotFound(); 
+            if (student == null) return NotFound();
             return student;
         }
 
+        // 🔴 2. قفلنا إضافة طالب جديد للأدمن فقط 🔒
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Student>> PostStudent(Student student)
         {
@@ -53,6 +56,8 @@ namespace SchoolManagement.Controllers
             return Ok(student);
         }
 
+        // 🔴 3. قفلنا تعديل بيانات الطلاب للأدمن فقط 🔒
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStudent(int id, Student student)
         {
@@ -69,9 +74,11 @@ namespace SchoolManagement.Controllers
                 if (!_context.Students.Any(e => e.Id == id)) return NotFound();
                 else throw;
             }
-            return NoContent(); 
+            return NoContent();
         }
 
+        // 🔴 4. قفلنا حذف الطلاب للأدمن فقط 🔒
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {
@@ -82,13 +89,14 @@ namespace SchoolManagement.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        // 🔴 5. قفلنا ميثود الـ list الاحتياطية للأدمن فقط 🔒
+        [Authorize(Roles = "Admin")]
         [HttpPost("list")]
         public IActionResult GetStudentsPost()
         {
             var students = _context.Students.ToList();
             return Ok(students);
         }
-
-
     }
 }

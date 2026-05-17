@@ -31,8 +31,8 @@ namespace SchoolManagement.Controllers
             {
                 if (login == null) return BadRequest("Request body is empty");
 
-                var user = await _context.Teachers
-                    .FirstOrDefaultAsync(t => t.Email == login.Email && t.Password == login.Password);
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == login.Email && u.Password == login.Password);
 
                 if (user == null)
                 {
@@ -48,7 +48,7 @@ namespace SchoolManagement.Controllers
             }
         }
 
-        private string GenerateJwtToken(Teacher teacher)
+        private string GenerateJwtToken(User user)
         {
             var keyString = _config["Jwt:Key"];
             var issuer = _config["Jwt:Issuer"];
@@ -59,14 +59,15 @@ namespace SchoolManagement.Controllers
                 throw new Exception("JWT Key is missing in appsettings.json!");
             }
 
-            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(keyString));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, teacher.Id.ToString()),
-                new Claim(ClaimTypes.Name, teacher.Name ?? "Unknown"),
-                new Claim(ClaimTypes.Role, "Teacher")
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username ?? "Unknown"),
+                
+                new Claim(ClaimTypes.Role, user.Role ?? "Teacher")
             };
 
             var token = new JwtSecurityToken(
