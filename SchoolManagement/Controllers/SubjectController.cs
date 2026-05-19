@@ -54,6 +54,7 @@ public class SubjectController : ControllerBase
         return Ok(subject);
     }
 
+    
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteSubject(int id)

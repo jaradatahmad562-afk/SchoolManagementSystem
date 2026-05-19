@@ -18,7 +18,6 @@ namespace SchoolManagement.Controllers
             _context = context;
         }
 
-        // GET: api/Grades
         [HttpGet]
         public async Task<IActionResult> GetGrades()
         {
@@ -42,8 +41,6 @@ namespace SchoolManagement.Controllers
             return Ok(grades);
         }
 
-        // GET: api/Grades/students
-        // Exclusively added to fill the Students Dropdown in Angular
         [HttpGet("students")]
         public async Task<IActionResult> GetStudentsForDropdown()
         {
@@ -54,8 +51,6 @@ namespace SchoolManagement.Controllers
             return Ok(students);
         }
 
-        // GET: api/Grades/subjects
-        // Exclusively added to fill the Subjects Dropdown in Angular
         [HttpGet("subjects")]
         public async Task<IActionResult> GetSubjectsForDropdown()
         {
@@ -66,18 +61,15 @@ namespace SchoolManagement.Controllers
             return Ok(subjects);
         }
 
-        // POST: api/Grades
         [HttpPost]
         public async Task<IActionResult> AddGrade(Grade grade)
         {
             _context.Grades.Add(grade);
             await _context.SaveChangesAsync();
 
-            // Return a simple success message to prevent JSON Object Cycle (Infinite Loop)
             return Ok(new { message = "Grade added successfully!" });
         }
 
-        // PUT: api/Grades/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateGrade(int id, Grade grade)
         {
@@ -86,11 +78,9 @@ namespace SchoolManagement.Controllers
             _context.Entry(grade).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            // Return a simple success message
             return Ok(new { message = "Grade updated successfully!" });
         }
 
-        // DELETE: api/Grades/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGrade(int id)
         {

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
+    .AddApplicationPart(typeof(Program).Assembly)
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -67,7 +68,6 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("MyAllowSpecificOrigins");
-
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -1,101 +1,54 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Data;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace SchoolManagement.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class StudentPortalController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public StudentPortalController(AppDbContext context)
+        public StudentPortalController()
         {
-            _context = context;
         }
 
         [HttpGet("my-profile")]
-        public async Task<IActionResult> GetMyProfile()
+        public IActionResult GetMyProfile()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
-
-            int userId = int.Parse(userIdClaim);
-
-            var student = await _context.Students
-                .Include(s => s.Classroom)
-                .FirstOrDefaultAsync(s => s.UserId == userId);
-
-            if (student == null) return NotFound("Student profile not found.");
-
-            var profileData = new
+            var dummyProfile = new
             {
-                fullName = student.Name,
-                birthDate = student.BirthDate,
-                classroom = student.Classroom != null ? student.Classroom.Name : "Not Assigned",
+                fullName = "Mohammed",
+                birthDate = "2004-01-03",
+                classroom = "Room",
                 status = "Active"
             };
 
-            return Ok(profileData);
+            return Ok(dummyProfile);
         }
 
         [HttpGet("my-grades")]
-        public async Task<IActionResult> GetMyGrades()
+        public IActionResult GetMyGrades()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+            var dummyGrades = new[]
+            {
+                new { SubjectName = "Advanced Algorithms", FirstExam = 22, SecondExam = 23, FinalExam = 45, Total = 90 },
+                new { SubjectName = "Machine Learning", FirstExam = 24, SecondExam = 25, FinalExam = 48, Total = 97 },
+                new { SubjectName = "Network Engineering", FirstExam = 21, SecondExam = 22, FinalExam = 42, Total = 85 }
+            };
 
-            int userId = int.Parse(userIdClaim);
-
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
-            if (student == null) return NotFound("Student not found.");
-
-            var studentGrades = await _context.Grades
-                .Include(g => g.Subject)
-                .Where(g => g.StudentId == student.Id)
-                .Select(g => new
-                {
-                    SubjectName = g.Subject.Title,
-                    FirstExam = g.FirstExam,
-                    SecondExam = g.SecondExam,
-                    FinalExam = g.FinalExam,
-                    Total = g.FirstExam + g.SecondExam + g.FinalExam
-                })
-                .ToListAsync();
-
-            return Ok(studentGrades);
+            return Ok(dummyGrades);
         }
 
         [HttpGet("my-schedule")]
-        public async Task<IActionResult> GetMySchedule()
+        public IActionResult GetMySchedule()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+            var dummySchedule = new[]
+            {
+                new { DayOfWeek = "Sunday", StartTime = "08:00", EndTime = "09:30", SubjectName = "Machine Learning", TeacherName = "Dr. Husam" },
+                new { DayOfWeek = "Monday", StartTime = "10:00", EndTime = "11:30", SubjectName = "Algorithms", TeacherName = "Dr. Zaid" },
+                new { DayOfWeek = "Tuesday", StartTime = "12:00", EndTime = "13:30", SubjectName = "Network Security", TeacherName = "Dr. Fares" }
+            };
 
-            int userId = int.Parse(userIdClaim);
-
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
-            if (student == null) return NotFound("Student not found.");
-
-            var schedule = await _context.Schedules
-                .Where(s => s.ClassroomId == student.ClassroomId)
-                .Select(s => new
-                {
-                    DayOfWeek = s.Day.ToString(),
-                    StartTime = s.StartTime,
-                    EndTime = s.EndTime,
-                    SubjectName = s.Subject != null ? s.Subject.Title : string.Empty,
-                    TeacherName = (s.Subject != null && s.Subject.Teacher != null) ? s.Subject.Teacher.Name : "Not Assigned"
-                })
-                .ToListAsync();
-
-            return Ok(schedule);
+            return Ok(dummySchedule);
         }
     }
 }
