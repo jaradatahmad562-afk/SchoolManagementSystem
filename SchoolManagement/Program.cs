@@ -19,8 +19,10 @@ builder.Services.AddControllers()
         options.SuppressModelStateInvalidFilter = true;
     });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var jwtKey = builder.Configuration["Jwt:Key"];
-// استخدمنا UTF8 للأمان والتوافقية
 var key = Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services.AddAuthentication(options =>
@@ -37,7 +39,6 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        // الأسطر الناقصة اللي كانت مسببة الـ 401 ⬇️
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
 
@@ -45,6 +46,7 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyAllowSpecificOrigins",
@@ -61,17 +63,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseCors("MyAllowSpecificOrigins");
 
-if (app.Environment.IsDevelopment())
-{
-}
-
 app.UseHttpsRedirection();
-
-app.UseAuthentication(); 
-app.UseAuthorization();  
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

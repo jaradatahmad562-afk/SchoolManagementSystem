@@ -15,7 +15,7 @@ namespace SchoolManagement.Data
         public DbSet<Schedule> Schedules { get; set; }
 
         public DbSet<User> Users { get; set; }
-
+        public DbSet<Grade> Grades { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

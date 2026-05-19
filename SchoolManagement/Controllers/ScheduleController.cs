@@ -6,7 +6,7 @@ using SchoolManagement.Models;
 
 namespace SchoolManagement.Controllers
 {
-    [Authorize] // 👈 شلنا التعليق وخليناها عامة عشان الأدمن والمدرس يقدروا يدخلوا ويشتغلوا كامل العمليات
+    [Authorize] 
     [Route("api/[controller]")]
     [ApiController]
     public class ScheduleController : ControllerBase

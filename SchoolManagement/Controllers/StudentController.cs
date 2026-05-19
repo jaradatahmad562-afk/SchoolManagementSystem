@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Models;
+using System.Security.Claims; 
 
 namespace SchoolManagement.Controllers
 {
-    [Authorize] // 👈 1. شلنا التعليق وخليناها عامة (أدمن + مدرس) عشان الطرفين يقدروا يقرأوا بيانات الطلاب
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class StudentController : ControllerBase
@@ -18,7 +19,6 @@ namespace SchoolManagement.Controllers
             _context = context;
         }
 
-        // 🟢 مسموح للكل (أدمن ومدرس) عشان المدرس يشوف طلابه
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
         {
@@ -36,7 +36,6 @@ namespace SchoolManagement.Controllers
             return Ok(students);
         }
 
-        // 🟢 مسموح للكل لقراءة تفاصيل طالب معين
         [HttpGet("{id}")]
         public async Task<ActionResult<Student>> GetStudent(int id)
         {
@@ -45,18 +44,28 @@ namespace SchoolManagement.Controllers
             return student;
         }
 
-        // 🔴 2. قفلنا إضافة طالب جديد للأدمن فقط 🔒
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Student>> PostStudent(Student student)
         {
+            var newUser = new User
+            {
+                Email = student.Email,
+                Password = student.Password,
+                Role = "Student"
+            };
+
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            student.UserId = newUser.Id;
+
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
             return Ok(student);
         }
 
-        // 🔴 3. قفلنا تعديل بيانات الطلاب للأدمن فقط 🔒
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStudent(int id, Student student)
@@ -77,7 +86,6 @@ namespace SchoolManagement.Controllers
             return NoContent();
         }
 
-        // 🔴 4. قفلنا حذف الطلاب للأدمن فقط 🔒
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
@@ -90,13 +98,36 @@ namespace SchoolManagement.Controllers
             return NoContent();
         }
 
-        // 🔴 5. قفلنا ميثود الـ list الاحتياطية للأدمن فقط 🔒
         [Authorize(Roles = "Admin")]
         [HttpPost("list")]
         public IActionResult GetStudentsPost()
         {
             var students = _context.Students.ToList();
             return Ok(students);
+        }
+
+        [HttpGet("my-profile")]
+        public async Task<ActionResult<object>> GetMyProfile()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized(new { message = "Invalid token claims." });
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var student = await _context.Students
+                .Include(s => s.Classroom)
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            if (student == null) return NotFound(new { message = "Student profile not found." });
+
+            return Ok(new
+            {
+                Id = student.Id,
+                Name = student.Name,
+                BirthDate = student.BirthDate,
+                ClassroomName = student.Classroom != null ? student.Classroom.Name : "Not Assigned",
+                Status = student.Status
+            });
         }
     }
 }
